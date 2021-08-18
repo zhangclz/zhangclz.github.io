@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: '副标题'
+title: zhangcl
+subtitle: '个人博客'
 description: '网站描述'
 keywords: hexo,github
 author: zhangcl
-language: en
+language: zh-CN
 timezone: ''
 
 # URL

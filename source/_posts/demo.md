@@ -1,18 +1,31 @@
 ---
 title: demo
 date: 2021-08-17 15:04:02
-tags:
+tags: "测试"
+updated: 2021-08-18
+categories: 瞎搞
+keywords: 尝试
+description: 这是用来做各种尝试的文章
+top_img: https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg
+copyright_author: 小张
+copyright_author_href: http://www.baidu.com
+copyright_info: copyright zhangcl
+copyright: true
 ---
 
 ### 代码
 ```let a = 1```
-```
+```javascript 匿名函数
 let a = 1
 let c = 3
+let d = function(){
+  return a+c
+}()
+console.log()
 ```
 
 {% code %}
-code snippet
+code snippet Ufsdhsdsdfgvfdbdfsdgvhfgvhsfdkgjkjgvsjfbhvjfjbvfjfjjfjjfjjfjfjjjjjjjjjjjfjfjjjfjjjjfjfjjsdfjkdhajkgvkjfdghkjhhjj
 {% endcode %}
 
 1. aaa
