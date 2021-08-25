@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 
-subtitle: '个人博客'
-description: '非宁静无以致远'
-keywords: hexo,github
-author: zhangcl
+title: zhangcl
+subtitle: 永无止境
+description: 非宁静无以致远
+keywords: javascript,vue,ts,react,node
+author: 北极夜
 language: zh-CN
 timezone: ''
 
