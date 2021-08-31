@@ -3,7 +3,7 @@ title: demo
 date: 2021-08-17 15:04:02
 tags: "测试"
 updated: 2021-08-18
-categories: 瞎搞
+categories: js
 keywords: 尝试
 description: 这是用来做各种尝试的文章
 top_img: https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg
@@ -46,3 +46,14 @@ code snippet Ufsdhsdsdfgvfdbdfsdgvhfgvhsfdkgjkjgvsjfbhvjfjbvfjfjjfjjfjjfjfjjjjjj
 
 *斜体*
 **粗体**
+<div class="gallery-group-main">
+{% galleryGroup '壁纸' '收藏的一些壁纸' '/Gallery/wallpaper' https://i.loli.net/2019/11/10/T7Mu8Aod3egmC4Q.png %}
+{% galleryGroup '漫威' '关于漫威的图片' '/Gallery/marvel' https://i.loli.net/2019/12/25/8t97aVlp4hgyBGu.jpg %}
+{% galleryGroup 'OH MY GIRL' '关于OH MY GIRL的图片' '/Gallery/ohmygirl' https://i.loli.net/2019/12/25/hOqbQ3BIwa6KWpo.jpg %}
+</div>
+
+{% gallery %}
+![](https://i.loli.net/2019/11/10/T7Mu8Aod3egmC4Q.png)
+![](https://i.loli.net/2019/12/25/8t97aVlp4hgyBGu.jpg)
+![](https://i.loli.net/2019/12/25/hOqbQ3BIwa6KWpo.jpg)
+{% endgallery %}
