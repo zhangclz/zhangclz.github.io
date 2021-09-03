@@ -1,9 +1,9 @@
 ---
 title: demo
 date: 2021-08-17 15:04:02
-tags: "测试"
+tags: 测试
 updated: 2021-08-18
-categories: js
+categories: JS
 keywords: 尝试
 description: 这是用来做各种尝试的文章
 top_img: https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg
