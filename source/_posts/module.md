@@ -1,6 +1,7 @@
 ---
 title: 前端模块化
-date: 2021-09-02 15:17:10
+# date: 2021-09-02 15:17:10
+date: 2021-09-02
 description: 本文讲述了前端模块化的概念、发展历程以及容易让人混淆的export、export default、module.exports和exports的区别和使用方法
 tags:
   - 概念
