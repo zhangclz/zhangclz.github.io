@@ -45,8 +45,10 @@ app.all("*",function(req,res,next){
 app.get("/",(req,res)=>{
   res.send("首页")
 })
-// 读取文件并返回数据
+
+// 读取文件并返回数据,不同的请求方式分开处理
 app.get("/file",(req,res)=>{
+  console.log(req.query)
   fs.readFile("./file.json",(err,data)=>{
     if(err){
       res.send("404 not found")
@@ -57,9 +59,21 @@ app.get("/file",(req,res)=>{
     }
   })
 })
+app.post("/file",(req,res)=>{
+  console.log(req.body);
+  fs.readFile("./file.json",(err,data)=>{
+    if(err){
+      res.send("404 not found")
+    } else {
+      res.send(data)
+    }
+  })
+})
+
 app.listen("3000",()=>{
   console.log("serve is running at port 3000");
 })
+
 // 在json文件中
 [
   {
@@ -68,6 +82,7 @@ app.listen("3000",()=>{
     "country":"中国"
   }
 ]
+
 // 在HTML中，通过ajax访问接口获取数据
 var ajax = new XMLHttpRequest()
 ajax.open("get","http://127.0.0.1:3000/file")
