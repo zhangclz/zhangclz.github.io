@@ -36,6 +36,12 @@ var fs = require("fs")
 var app = express()
 // app.use(express.static("./public/"))    //开放public文件夹访问权限
 app.use("/public",express.static("./public/"))    //开放public文件夹访问权限,推荐使用这种方式，比较好区分路径
+// 全局设置跨域和Content-Type
+app.all("*",function(req,res,next){
+  res.header({"Access-Control-Allow-Origin":"*","Content-Type":"application/json;charset=UTF-8"})
+  next()
+})
+
 app.get("/",(req,res)=>{
   res.send("首页")
 })
@@ -45,8 +51,8 @@ app.get("/file",(req,res)=>{
     if(err){
       res.send("404 not found")
     } else {
-      // res.setHeader的别名是res.header。设置跨域和Content-Type防止中文乱码
-      res.header({"Access-Control-Allow-Origin":"http://127.0.0.1:5500","Content-Type":"application/json;charset=UTF-8"})
+      // res.setHeader的别名是res.header。设置跨域和Content-Type防止中文乱码，全局设置后就不用再设置了
+      // res.header({"Access-Control-Allow-Origin":"http://127.0.0.1:5500","Content-Type":"application/json;charset=UTF-8"})
       res.send(data)
     }
   })
