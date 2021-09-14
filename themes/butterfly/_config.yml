@@ -22,9 +22,9 @@ hide_sidebar_menu_child: false
 highlight_theme: pale night #  darker / pale night / light / ocean / mac / mac light / false
 highlight_copy: true # copy button
 highlight_lang: true # show the code language
-highlight_shrink: none # true: shrink the code blocks / false: expand the code blocks | none: expand code blocks and hide the button
-highlight_height_limit: false # unit: px
-code_word_wrap: false
+highlight_shrink: false # true: shrink the code blocks / false: expand the code blocks | none: expand code blocks and hide the button
+highlight_height_limit: 130 # unit: px
+code_word_wrap: true
 
 # copy settings
 # copyright: Add the copyright information after copied content (複製的內容後面加上版權信息)
@@ -115,7 +115,7 @@ category_per_img:
 
 cover:
   # display the cover or not (是否顯示文章封面)
-  index_enable: true
+  index_enable: false
   aside_enable: true
   archives_enable: fasle
   # the position of cover in home page (封面顯示的位置)
@@ -632,7 +632,7 @@ aside:
       link: https://github.com/zhangclz/zhangclz.github.io
   card_announcement:
     enable: true
-    content: 记录日常收获和总结，仅代表个人观点
+    content: 记录日常收获和总结
   card_recent_post:
     enable: true
     limit: 3 # if set 0 will show all
