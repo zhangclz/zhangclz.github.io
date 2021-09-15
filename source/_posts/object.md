@@ -3,7 +3,7 @@ title: 对象的方法
 date: 2021-09-14
 tags: 语法
 categories: JS
-description: 本文简要介绍javascript中对象的原生方法以及用法，持续更新...
+description: 简要介绍javascript中对象的原生方法以及用法，持续更新...
 ---
 ### Object.assign
 引用MND的话来说:
@@ -55,7 +55,7 @@ console.log(newObj.depObj.age)    //88
 
 既然这个方法可以实现对象的拷贝，就简单说下其他的对象拷贝方法：
 1. JSON.stringify和JSON.parse
-这两个方法分别是将js对象转换成json字符串和将json字符串解析成js对象，先用`JSON.stringify()`再用`JSON.parse()`可达到和`Object.assign()`一样的拷贝效果，同样的如果属性是复杂数据类型只能拷贝值的应用，属于浅拷贝
+这两个方法分别是将js对象转换成json字符串和将json字符串解析成js对象，先用`JSON.stringify()`再用`JSON.parse()`可达到和`Object.assign()`一样的拷贝效果，同样的如果属性是复杂数据类型只能拷贝值的引用，属于浅拷贝
 ```javascript
 let obj = {
   name: 'zs'
