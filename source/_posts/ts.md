@@ -42,3 +42,26 @@ console.log(Color.red)   //0
 enum Color1 {red = 10, blue = 20, green = 30}
 console.log(Color1.red)   //10
 ```
+### interface接口
+在TS中接口用来定义一个对象中数据的类型，用interface关键字来定义
+```typescript
+interface Point {
+  x: number,
+  y: number
+}
+// 在申明对象的时候指定对象的接口就能限制属性的数据类型，当对象属性缺失或者数据类型不匹配会报错
+let obj: Point = {
+  x:1,
+  y:2
+}
+```
+申明class类的时候也可以用interface来限制类中的属性和函数，使用implement关键字 `class point implement Point {}`
+### 泛型
+在定义、函数、接口、类时，不预先指定具体的类型，而是在使用的时候再指定类型限制的一种特性
+```typescript
+let fn =  <T>(num: T) => {
+  return num
+}
+console.log(typeof(fn(1)))    //number
+console.log(typeof(fn("1")))    //string
+```
