@@ -104,4 +104,99 @@ console.log(ob.dep.age)  //88
 console.log(newOb.dep.age)  //18
 // 由结果可知，成功进行了深拷贝，拷贝后源数据和新数据不会相互影响
 ```
+
+### Object.create
+> 该方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__
+```javascript
+let obj1 = {
+   name: 'zs',
+   age: 18,
+   fun: function(){
+     console.log("my name is"+" "+this.name);
+   }
+}
+let obj2 = Object.create(obj1)
+cosole.log(obj2)
+cosole.log(obj2.__proto__)
+```
+输出结果如下：可以看到，使用`Object.create()`方法第一个参数传入的对象作为了新对象的原型
+![objectCreate](./object/objectCreate.png)
+`Object.create()`可以接受第二个参数，这个参数是可选的，作用是给新创建的对象添加属性
+```javascript
+let obj2 = Object.create(obj1,{name:{value:'ls',writable:true,enumerable:true,configurable:true}})
+console.log(obj2)
+console.log(obj2.__proto__);
+```
+输出结果：
+![objectCreate](./object/create.png)
+从结果可知，已经成功给新创建的对象添加了一个name属性，值是ls
+
+接下来就说说第二个参数只是添加了个属性为写这么一长串东西
+* Object.create()的第二个参数接受一个对象，该对象的属性名作为新创建的对象中的属性名，该对象的属性值为该属性的配置项，也是一个对象
+* 配置项对象的value：代表该属性的值
+* writable：该属性是否是可修改的。默认为false，所以要手动设置为true
+* configurable: 该属性是否是可删除的。也是默认为false
+* enumerable：该属性是否是可枚举的。默认为false。比如使用for in去遍历这个对象，enumerable为false的属性就不能被遍历出来。其他还有Object.keys、JSON.stringify、Object.assign等方法都是操作的对象可枚举属性
+
+### Object.defineProperties
+> 直接在一个对象上定义新的属性或修改现有属性，并返回该对象。接受两个参数，第一个是要操作的对象，第二个是对对象的具体操作，也是个对象
+
+很简单，直接上代码
+```javascript
+let obj1 = {
+  name: 'zs',
+  age: 18,
+}
+console.log("修改之前",obj1);
+Object.defineProperties(obj1,{
+  name:{
+    value:'ls'
+  }
+})
+console.log("修改之后",obj1);
+```
+这样就成功的修改了obj1对象的name属性值
+![defineProperties](./object/define.png)
+和上面`Object.create`方法的第二个参数一样，也有writable、configurable、enumerable属性，通过字面量、构造函数、`new Object()`出来的对象这些属性值默认为true
+```javascript
+Object.defineProperties(obj1,{
+  name:{
+    value:'ls',
+    writable:true,
+    configurable:true,
+    enumerable:true
+  },
+  age:{
+    value:88
+  }
+})
+```
+### Object.defineProperty
+> 和Object.defineProperties一样，都是直接在一个对象上定义新的属性或修改现有属性，并返回该对象。
+
+他们的区别是`Object.defineProperty`一次只能对一个属性进行操作。而`Object.defineProperties`可以同时设置对象的多个属性，比如上面同时设置name和age属性
+`Object.defineProperty`接受3个参数，第一个是操作的对象，第二个是操作的属性，第三个是对属性的具体操作
+ps：如果对属性进行get和set重写，则不能同时设置属性的value，会报错
+```javascript
+let obj1 = {
+  name: 'zs',
+  age: 18
+}
+// 这里要用一个空对象来充当被操作的对象，如果直接传obj1，那么get操作中return的时候又获取了一次对象属性
+// 就会再次触发get，这样就会形成死循环，一直会去get
+let p = {}
+Object.defineProperties(p,"name",{
+    get(){
+      console.log("获取name的值");
+      return obj1.name
+    },
+    set(val){
+      console.log("设置了name属性");
+      obj1.name = val
+    }
+  }
+)
+```
+![defineProperty](./object/define1.png)
+
 ---
