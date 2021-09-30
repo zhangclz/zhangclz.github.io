@@ -138,6 +138,8 @@ console.log(obj2.__proto__);
 * configurable: 该属性是否是可删除的。也是默认为false
 * enumerable：该属性是否是可枚举的。默认为false。比如使用for in去遍历这个对象，enumerable为false的属性就不能被遍历出来。其他还有Object.keys、JSON.stringify、Object.assign等方法都是操作的对象可枚举属性
 
+
+补充：`Object.create(null)`用以创建一个没有原型的对象
 ### Object.defineProperties
 > 直接在一个对象上定义新的属性或修改现有属性，并返回该对象。接受两个参数，第一个是要操作的对象，第二个是对对象的具体操作，也是个对象
 
