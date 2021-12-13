@@ -3,7 +3,7 @@ title: 对象的方法
 date: 2021-09-14
 tags: 语法
 categories: JS
-description: 简要介绍javascript中对象的原生方法以及用法，持续更新...
+description: 简要介绍javascript中对象的原生方法以及用法
 ---
 ### Object.assign
 引用MND的话来说:

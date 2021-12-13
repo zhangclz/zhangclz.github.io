@@ -3,7 +3,7 @@ title: tips
 date: 2021-09-15
 tags: 概念
 categories: 日常
-description : 一个常用的知识点，一个简单的概念，一个突发的灵感，一个实用的骚操作...
+description : 一些实用的概念，骚操作和灵感
 ---
 ### JavaScript
 * 对字符串直接比较大小会自动把字符串转换为ascll码来比较
