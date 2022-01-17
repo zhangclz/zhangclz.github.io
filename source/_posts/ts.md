@@ -23,9 +23,9 @@ let b: string = (<string>a)   //使用()和<>
 let b: string = (a as string)   //使用()和as
 ```
 ! 和 ? 的使用
-* 在TS中 ! 表示变量不是null或者undefined的断言，如果赋了值用 ! 会报错。
+* 在TS中 ! 表示变量不是null或者undefined的断言，让它可以通过编译。用在赋值的内容后时，使null和undefined类型可以赋值给其他类型并通过编译，表示该变量值可空
 常用在子组件接收父组件传值的地方`@Prop(Number) prop1!: number`
-* ? 表示函数参数是非必传的
+* ? 表示函数参数是非必传。也常用于防御式编程，在访问对象的属性时，在对象后面写 ? 表示对象存在才会去读取属性 `userinfo?.name`
 ```typescript
 function fn(name: string, age?: number){
   console.log(name)   //'zs'

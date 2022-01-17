@@ -3,7 +3,7 @@ title: ajax
 date: 2021-09-10
 tags: ajax
 categories: JS
-description: ajax的基本使用以及使用promise对ajax进行建议封装
+description: ajax的基本使用以及使用promise对ajax进行简易封装
 ---
 ### 原生ajax的使用
 ```javascript
@@ -75,3 +75,61 @@ btn.onclick = function(){
 ```
 ---
 后端配置请点击[这里](https://zhangclz.github.io/nodejs/)进行查看，第二条express
+
+### axios的通用封装
+1. 配置axios实例
+```javascript
+// instance.js
+import axios from 'axios'
+
+let instance = new axios.create({
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  baseURL: 'http://xxx.com',
+  timeout: 60000
+})
+// 适配器，用于使用其他框架的请求方法比如wx.request然后将数据返回。或者做数据mock，模拟服务，返回mock数据。很少使用
+// instance.defaults.adapter = function (config) {
+//   return new Promise((resolve,reject)=>{
+//     resolve(111) //将不再发起请求，直接返回111
+//   })
+// }
+
+// 请求拦截器，一般用于在请求头里面添加数据
+instance.interceptors.request.use((config)=>{
+  return config
+})
+
+// 响应拦截器，用于在接收到后端请求后对错误进行统一处理和返回简化后的结果，有两个回调函数，一个成功一个失败的
+instance.interceptors.response.use((response)=>{
+  if(response.status == 200 && response.data.status == 200){
+    return response.data
+    // return Promise.resolve(response.data) 这种写法也可以
+  } else if(response.status == 200 && response.data.status == 500){
+    return Promise.reject(response.data.error)
+  }
+},(error=>{
+  console.log('error',error);
+}))
+
+export { instance }
+```
+
+2. 配置全局请求方法
+```javascript
+//service.js或api.js
+import { instance } from "./instance";
+
+// axios会自动把get请求传递的对象参数转换为标准的get参数格式，因此不需要手动转换，如果直接用/传递，则任需手动转换
+// export const test = (params) => {
+//   return instance.get(`/api/test`, {params})
+// }
+export const test = (phone,code) => {
+  return instance.get(`/api/test/${phone}/${code}/true`)
+}
+
+export const login = (params) => {
+  return instance.post(`/api/test`, params);
+};
+```
