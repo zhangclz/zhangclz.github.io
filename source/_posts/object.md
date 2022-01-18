@@ -55,7 +55,12 @@ console.log(newObj.depObj.age)    //88
 
 既然这个方法可以实现对象的拷贝，就简单说下其他的对象拷贝方法：
 1. JSON.stringify和JSON.parse
-这两个方法分别是将js对象转换成json字符串和将json字符串解析成js对象，先用`JSON.stringify()`再用`JSON.parse()`可达到和`Object.assign()`一样的拷贝效果，同样的如果属性是复杂数据类型只能拷贝值的引用，属于浅拷贝
+这两个方法分别是将js对象转换成json字符串和将json字符串解析成js对象，先用`JSON.stringify()`再用`JSON.parse()`可达到和`Object.assign()`一样的拷贝效果，这种方法属于深拷贝，但有以下注意事项：
+* 如果json里面有时间对象，则序列化结果：时间对象=>字符串的形式
+* 如果json里有RegExp、Error对象，则序列化的结果将只得到空对象 RegExp、Error => {}
+* 如果json里有 function,undefined，则序列化的结果会把 function,undefined 丢失
+* 如果json里有NaN、Infinity和-Infinity，则序列化的结果会变成null
+* 如果json里有对象是由构造函数生成的，则序列化的结果会丢弃对象的 constructor
 ```javascript
 let obj = {
   name: 'zs'
@@ -65,9 +70,8 @@ console.log(newObj.name)    //zs
 obj.name = 'ls'
 console.log(obj.name)    //ls
 console.log(newObj.name)    //zs
-// 和Object.assign()效果一样，复杂数据类型效果也一样
 ```
-2. 使用递归实现深拷贝
+1. 使用递归实现深拷贝
 对于属性值是复杂数据类型的对象或者数组，都可以使用递归来进行深拷贝，不管数据嵌套多少层都可以
 ```javascript
  let deepClone = function(old){
