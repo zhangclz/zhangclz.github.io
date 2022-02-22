@@ -16,3 +16,28 @@ description : 一些实用的概念，骚操作和灵感
 * 数组的`splice()`方法返回值是被删除的值组成的数组，并不是删除之后剩余的数组
 * 获取对象的长度，可以先用`Object.entries()`把对象的属性和值转换成了键值对数组，再用`new Map()`把这个数组转换为map对象，使用size属性即可查看对象长度
 * 数组去重：使用`new Set()`把数组转换为集合，此时就已经去重了，再用[...]展开运算符把集合转成数组即可
+* 使用`typeof`可判断基本类型，判断对象和数组得到'object'，判断函数为'function'
+* 判断引用数据类型使用`instanceof`，判断是否是某个构造函数的实例，但是3种引用类型都是Object的实例，此外数组是Array，函数时Function
+
+### 实用方法
+* 时间戳转换为标准时间格式
+```javascript
+function formatDate(){
+  function addZero(num){
+    if(num < 10){
+      return '0'+num
+    } else {
+      return num
+    }
+  }
+  const date = new Date();
+  let years = date.getFullYear(),
+  months = date.getMonth() +1,
+  days = date.getDate(),
+  hours = date.getHours(),
+  minutes = date.getMinutes(),
+  seconds = date.getSeconds();
+  const time = (years + "-" + addZero(months) + "-" + addZero(days) + " " + addZero(hours) + ":" + addZero(minutes) + ":" + addZero(seconds));
+  return time;
+}
+```
