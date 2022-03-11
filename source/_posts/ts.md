@@ -66,7 +66,7 @@ console.log(typeof(fn(1)))    //number
 console.log(typeof(fn("1")))    //string
 ```
 
-# 系统学习
+# 梳理
 **ts相比于js的优势：**
 1. 具有语法错误提示
 2. 具有快捷的语法编写提示
@@ -81,9 +81,12 @@ console.log(typeof(fn("1")))    //string
 2. `const num = (num: number): number => num`
 
 **interface（接口）和type（类型别名）的区别**
-两者都可以定义一个类型，但interface是通过对象的形式来定义，而type既可以用对象方式，也可以直接指定某一种类型
+1. 两者都可以定义一个类型，但interface是通过对象的形式来定义，而type既可以用对象方式，也可以直接指定某一种类型
+2. 接口具有合并效果，同名会合并，type则会报错
+3. type可使用&符进行类型成员合并
+4. 接口可以继承一个或多个接口或类，type无继承
 ts文件编译成js文件后，接口会被剔除，他只是在ts文件中起校验和语法提示的作用，并不会被转换成js代码
-```javascript
+```typescript
 interface  Point {
   x:number;
   y:number;
@@ -103,7 +106,7 @@ type Point = number
 3. protected允许在类内和子类内调用，但无法在类外使用
 
 对于private的属性可以通过`get`和`set`方法来间接的进行读取和修改
-```javascript
+```typescript
 class Person {
   constructor (private _name:string){
     get name(){
@@ -120,7 +123,7 @@ person.name = 'ls'        //先调用set方法去改变_name的值
 console.log(person.name)  //'ls'  再调用get方法去获取类里面的_name
 ```
 **实例化类的时候会自动执行类的构造器（constructor），并且构造器能接收传进来的参数，在形参前面用修饰符，代表在类里面赋值（语法糖）**
-```javascript
+```typescript
 class Person {
   // public name:string;
   constructor (public name:string){
@@ -134,3 +137,63 @@ const person = new Person('zs')
 **单例模式：类只能被实例化一次，若重复实例化，则直接返回第一次实例化出来的对象。私有构造器，用静态方法去创建实例**
 
 **.d.ts类型定义文件的作用是将js代码翻译成ts代码来给我们在开发中使用**
+
+**类的装饰器本质上是一个函数，一般情况下通过@符号来使用**
+```typescript
+// 简单写法
+function decoretor(constructor:any){
+  constructor.prototype.getName = () => {
+    return this.name
+  }
+}
+
+@decoretor
+class Test{
+  name:string
+  constructor(name:sting){
+    this.name = name
+  }
+}
+
+const instance = new Test('zs')
+(instance as any).getName()    // 输出'zs'
+
+// 完整写法，有语法提示
+function decoretor(){
+  return function <T extends new (...agrs: any[]) => any>(constructor: T){
+     return class extends constructor{
+       getName(){
+         return this.name
+       }
+     }
+   }
+}
+// 当类初始化的时候就会调用这个装饰器（并不是实例化）
+const Test = decorator()(
+  class {
+    name:string
+    constructor(name:string){
+      this.name = name
+    }
+  }
+)
+
+// 实例化后可以调用getName方法
+const instans = new Test('zs')
+instans.getName()   // 输出'zs'
+```
+
+**方法的构造器**
+```typescript
+function fnDecorator(target:any,key:string,descrpitor:PropertyDescriptor){
+  // key是被修饰的方法。descrpitor是方法的基本属性，类似于js的object中属性的基本属性，可读可写之类的
+
+  // 普通方法，target对应的是类的prototype
+  // 静态方法，对应的是类的构造函数
+  console.log(target)
+}
+class Test {
+  @fnDecorator
+  getName(){}
+}
+```

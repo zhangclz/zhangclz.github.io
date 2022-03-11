@@ -8,6 +8,31 @@ description: vue3的基本语法和相比于vue2的一些修改
 ### ref和reactive的区别
 ![ref和reactive区别](ref_reactive.png)
 
+**reactive使用注意事项**
+当使用`reactive`声明了一个复杂数据类型（对象或数组）后，不能够直接让这个数据去等于另一个复杂数据类型，否则响应式会失效，页面不会更新
+```javascript
+let arr = reactive([1,2])
+arr = [3,4]   //这样直接赋值arr将不再具有响应式并且页面也不会更新
+正确的用法：arr[0] = 3,arr[1] = 4
+
+或者把数组变为对象的属性，然后直接对属性赋值：
+let arr = reactive({data:[1,2]})
+arr.data = [3,4]
+
+// 对象同理
+let obj = reactive({name:zs})
+错误：obj = {name:'ls'}
+正确：obj.name = 'ls'
+// 对象这样处理就行了，如果不嫌麻烦的话也可以把对象写成另一个对象的属性，然后对属性赋值
+
+还有个最简单的方法，就是直接用ref去声明复杂数据类型，然后就可以直接赋值了
+let arr = ref([1,2])
+arr.value = [3,4]
+因为用ref声明复杂数据类型时，ref会自动调用reactive把数据转换为proxy对象，同时这个对象属于ref的value属性。所以这就和上面自己定义一个对象的属性一样，只不过这个更简洁
+```
+而reactive会出现上述问题的原因是：**reactive实现响应式是通过*ES6的proxy代理对象 + reflect反射对象去操作原对象*实现的，当直接对这个对象赋值后，这个对象就不再指向proxy，而是指向你赋值的那个普通对象，所有就没有了响应式**
+ref实现响应式的原理：数据劫持（和vue2一样）
+
 ### vue2、3中watch、computed的用法差别
 **vue2：watch**
 ```javascript
