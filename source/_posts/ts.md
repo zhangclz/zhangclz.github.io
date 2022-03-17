@@ -122,6 +122,12 @@ console.log(person.name)  //'zs'  这里会调用get方法去获取类里面的_
 person.name = 'ls'        //先调用set方法去改变_name的值
 console.log(person.name)  //'ls'  再调用get方法去获取类里面的_name
 ```
+**static**
+> 在类中使用static修饰属性或方法表示这个是直接挂在类上面的，不用实例化也可以调用
+但需要注意以下几点
+1. static方法只能调用static属性或方法(使用`类名.`或者`this`调用)
+2. 非static方法可以在类中通过`类名.`的语法去调用static的属性或方法，而实例化后无法通过对象变量的点语法去访问静态属性或方法
+
 **实例化类的时候会自动执行类的构造器（constructor），并且构造器能接收传进来的参数，在形参前面用修饰符，代表在类里面赋值（语法糖）**
 ```typescript
 class Person {
@@ -197,3 +203,182 @@ class Test {
   getName(){}
 }
 ```
+
+**函数重载**
+重载签名：可以有多个，只有函数名和参数，没有函数体
+实现签名：只有一个，有函数体
+
+> 只能调用重载签名，根据传递的参数来判断进入的是哪个重载签名
+
+因为函数重载能根据不同的参数类型指定不同的函数返回值，所以函数处理过后的数据能够有语法提示。而直接使用函数只能指定一种返回值类型，大多数情况下不满足需求，就只能返回any类型或联合类型，所以就没有语法提示了
+```typescript
+type baseType = "image" | "audio" | string;
+type msgType = {
+  id: number;
+  type: baseType;
+  msg: string;
+};
+
+const msgInfo: msgType[] = [
+  {
+    id: 1,
+    type: "image",
+    msg: "第一张图片",
+  },
+  {
+    id: 2,
+    type: "audio",
+    msg: "一段音频",
+  },
+  {
+    id: 3,
+    type: "image",
+    msg: "第二张图片",
+  },
+];
+
+function getMsg(id: number): msgType; //重载签名
+function getMsg(type: baseType): msgType[]; //重载签名
+function getMsg(params: any): msgType | msgType[] | undefined {   //实现签名
+  if (typeof params === "number") {
+    for (const item of msgInfo) {
+      if(item.id === params){
+        return item
+      }
+    }
+  } else {
+    return msgInfo.filter((item) => item.type === params);
+  }
+}
+
+let result = getMsg(2)  //传字符串就会把第二个重载签名和实现签名的函数体结合成一个函数来执行
+```
+
+## JS继承
+1. **原型链继承**：子构造函数的原型对象属性指向父构造函数的实例化对象
+```javascript
+// 父构造函数
+function Parent () {
+  this.name = 'zs'
+}
+// 子构造函数
+function Son () {
+  this.age = 18
+}
+// 父构造函数原型上添加方法
+Parent.prototype.fn = function(){
+  return this.name
+}
+// 子继承父
+Son.prototype = new Parent()
+// 让constructor重新指向之子构造函数，因为每一个构造函数的constructor应该都是指向自己的
+Son.prototype.constructor = Son
+let son = new Son()
+console.log(son.fn());    // 输出zs，子构造函数的实例对象可以使用父构造函数中的属性和方法了
+```
+不足：子构造函数不能向父构造函数传递参数
+
+2. **对象冒充**：使用call和apply将子构造函数this和其他的参数传递给父构造函数
+```javascript
+// 父构造函数
+function Parent () {
+  this.name = 'zs'
+}
+// 子构造函数
+function Son (num) {
+  this.age = 18
+  // 对象冒充，call传参时this后面的参数是一个一个分开的，apply参数是一个数组，这是唯一区别
+  Parent.call(this,num)
+}
+let son = new Parent(66)
+// 此时son对象上会多出name属性
+```
+不足：此方法只能让子构造函数继承到父构造函数体中的属性和方法，无法继承原型
+
+3. **组合继承**：结合原型链继承和对象冒充
+```javascript
+// 父构造函数
+function Parent (...arguments) {  //这里要使用...arguments才能完整获取apply传递的参数数组，否则只会获取到数组中的第一个参数
+  this.name = 'zs'
+}
+// 子构造函数
+function Son (num) {
+  this.age = 18
+  Parent.apply(this,[num,99])
+}
+
+Parent.prototype.fn = function(){
+  return this.name
+}
+// 子继承父
+Son.prototype = new Parent()
+Son.prototype.constructor = Son
+
+let son = new Son(66)
+console.log(son.fn());    // 输出zs，子构造函数的实例对象可以使用父构造函数中的属性和方法了
+```
+不足：调用了两次父构造函数，浪费内存，降低了代码运行效率
+ps：这里不直接让子构造函数的原型等于父构造函数的原型是因为这样写的话子构造函数的实例对象原型链的上一级就不是父构造函数的原型了
+
+4. **寄生组合继承**：使用一个额外的构造函数去获取父构造函数的原型（最佳继承方式）
+```javascript
+// 父构造函数
+function Parent () {
+  this.name = 'zs'
+}
+// 子构造函数
+function Son () {
+  this.age = 18
+  // 继承父构造函数体中的属性和方法   继承第一部分
+  Parent.apply(this)
+}
+
+Parent.prototype.fn = function(){
+  return this.name
+}
+
+// 原型继承函数
+function _extends (parent,son){
+  // 寄生构造函数
+  function Middle(){
+    this.constructor = Son    //让子构造函数的constructor指向子构造函数自己
+  }
+  // 将父构造函数的原型赋值给寄生构造函数
+  Middle.prototype = parent.prototype
+  return new Middle()  //返回的Middle对象实例的原型是指向父构造函数的
+  // 因为Middle构造函数体中没有任何属性和方法，它的原型又等于父构造函数的原型，所以new Middle()就相当于只实例化了父构造函数的原型
+}
+
+// 给子构造函数的原型赋值，以原型继承函数为中介，间接去获取父构造函数的原型    继承第二部分
+Son.prototype = _extends(Parent,Son)
+
+let son = new Son()
+console.log(son.name)      //输出zs
+console.log(son.fn());    // 输出zs
+
+
+
+// 也可以使用Object.create来获取父构造函数的原型
+// 但这种方法的复用性和灵活程度不如上面的方法
+function _extends (parent){
+  // Object.create的返回值是一个对象，并且该对象的原型是传递的参数
+  return Object.create(parent.prototype)
+}
+Son.prototype = _extends(Parent)
+// 由于不能在_extends函数中修改constructor的指向，所以只能放到外面
+Son.prototype.constructor = Son
+let son = new Son()
+```
+
+## TS继承
+> TS继承使用extends关键字，实现原理和JS的寄生组合继承一致
+
+**super的用法**
+1. 用在子构造函数的constructor中，接收的参数是父构造函数的属性，表示在子构造函数中使用父构造函数定义的属性
+2. 在子构造函数的constructor外部使用`super.`的语法，可以直接调用父构造函数中的方法（原理是调用父构造函数原型上的方法）
+
+**方法重写(override)**
+必须满足3个条件：
+1. 和父类方法名相同
+2. 参数和父类方法相同
+3. 父类方法访问范围必须小于子类重写方法的访问范围（public > protected > private），而且父方法不能是private

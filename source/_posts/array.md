@@ -7,6 +7,7 @@ description: 简要介绍javascript中数组的原生方法以及用法
 ---
 ### Array.prototype.map()
 > map() 方法创建一个新数组，其结果是该数组中的每个元素是调用一次提供的函数后的返回值
+> 而filter的返回值是提供的函数返回值为true的这次循环的元素数组
 ```javascript
 let arr = [1,2,3,4,5,6]
 arr.map((v)=>{
@@ -32,3 +33,7 @@ console.log(newarr)
 // 输出[2,3,4,5,6,7] 
 ```
 
+**forEach、for-in与for-of**
+1. foreach 方法没办法使用 break 语句跳出循环，或者使用return从函数体内返回
+2. for-of 可以使用 break, continue 和 return,也可以用来遍历字符串
+3. for-in常用于循环对象，不用于循环数组
