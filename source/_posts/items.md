@@ -41,3 +41,13 @@ function formatDate(){
   return time;
 }
 ```
+* vue中定义函数时接收事件参数外的其他参数
+```javascript
+// 方法1：
+@change="handleChange(arguments,index)"
+// arguments为事件默认传递的参数数组，此时需要手动去获取需要的值。index是自己额外想要传递的参数
+
+// 方法2
+@change="(status)=>{handleChange(status,index)}"
+// status即为事件参数传递的值，index是自己额外传递的值
+```
