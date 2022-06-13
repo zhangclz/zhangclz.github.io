@@ -55,7 +55,7 @@ description: Git基础常用和很实用的命令
 `git stash pop`
 * 恢复保存的代码，但不删除保存内容，不加参数默认恢复最后一次保存的代码，可指定恢复某次保存内容
 `git stash apply`
-`git stash apply stash名字`比如：`git stash apply stash@{1}`
+`git stash apply stash名字`比如：`git stash apply 1`
 * 查看保存的内容和当前目录的差异，可指定查看某条记录，可查看具体差异
 `git stash show`
 `git stash show stash名字`
