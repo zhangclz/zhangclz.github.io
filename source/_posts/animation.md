@@ -3,7 +3,7 @@ title: css动画
 date: 2022-04-24
 tags: 语法
 categories: CSS
-description: 一些好用，使用的css样式和动画
+description: 一些好用，实用的css样式和动画
 ---
 
 ### 加载动画

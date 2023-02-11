@@ -3,7 +3,7 @@ title: 数组的方法
 date: 2021-12-13
 tags: 语法
 categories: JS
-description: 简要介绍javascript中数组的原生方法以及用法
+description: javascript中数组的原生方法以及用法
 ---
 ### Array.prototype.map()
 > map() 方法创建一个新数组，其结果是该数组中的每个元素是调用一次提供的函数后的返回值

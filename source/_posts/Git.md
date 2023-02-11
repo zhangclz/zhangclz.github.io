@@ -2,7 +2,7 @@
 title: Git
 date: 2022-03-18
 tags: 命令
-description: Git基础常用和很实用的命令
+description: Git常用且很实用的命令
 ---
 
 ## branch

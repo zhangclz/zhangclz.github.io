@@ -3,7 +3,7 @@ title: tips
 date: 2021-09-15
 tags: 概念
 categories: 日常
-description : 一些实用的方法，操作和灵感
+description : 一些实用的方法和操作
 ---
 ### JavaScript
 * 对字符串直接比较大小会自动把字符串转换为ascll码来比较
@@ -40,6 +40,41 @@ function formatDate(){
   const time = (years + "-" + addZero(months) + "-" + addZero(days) + " " + addZero(hours) + ":" + addZero(minutes) + ":" + addZero(seconds));
   return time;
 }
+```
+* 时间格式转换高级版
+```javascript
+function formatTime(date, fmt) {
+  let time = date ? new Date(date) : new Date();
+  if (!fmt) {
+    fmt = "yyyy-mm-dd";
+  }
+  let opt = {
+    "y+": time.getFullYear().toString(),
+    "m+": (time.getMonth() + 1).toString(),
+    "d+": time.getDate().toString(),
+    "H+": time.getHours().toString(),
+    "M+": time.getMinutes().toString(),
+    "S+": time.getSeconds().toString(),
+  };
+  for (const key in opt) {
+    if (Object.hasOwnProperty.call(opt, key)) {
+      let ret = new RegExp(key).exec(fmt);  //使用正则获取传入的时间格式的对应位的长度
+      if (ret) {
+        fmt = fmt.replace(
+          ret[0],
+          ret[0].length == 1  //如果传入的格式对应的长度小于或等于时间值的长度，就直接使用这个时间值，否则用零在前面补齐到时间值的长度
+            ? opt[key]
+            : opt[key].padStart(ret[0].length, "0")
+        );
+      }
+    }
+  }
+  console.log(fmt);
+  return fmt
+}
+
+// 接收两个参数：第一个为时间，各种格式都可以。第二个为时间格式，默认只有年月日。
+formatTime("","yyyy-mm-dd HH:MM:SS");
 ```
 * vue中定义函数时接收事件参数外的其他参数
 ```javascript
