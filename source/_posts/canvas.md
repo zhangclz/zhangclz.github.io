@@ -5,7 +5,7 @@ tags: 语法
 categories: JS
 description: canvas最基本的使用方法
 ---
-以在**微信小程序**给一张图片添加时间水印为例子，介绍两种方法。在web端的用法也基本一样
+以在**微信小程序**给一张图片添加时间水印为例子，介绍两种方法
 1. CanvasContext：canvas旧版的接口
 直接上代码
 ```HTML
@@ -62,4 +62,37 @@ query.select('#canvas')
      let result = canvas.toDataURL()
    }
  })
+```
+3. web端使用canvas 2D给图片添加水印，和小程序有些许不同
+```html
+<!-- 画布大小先不设置，后面根据图片大小来动态设置，可以先把画布定位到屏幕外面去 -->
+  <canvas id='canvas' type='2d'></canvas>
+  <!-- 图片可以先设置大小让他在网面上占位 -->
+  <img class="imgWrap" mode="widthFix" width="600px">
+```
+```javascript
+  let time = new Date().toLocaleDateString()
+  let imgWrap = document.querySelector(".imgWrap")
+  const canvas = document.querySelector("#canvas")
+  const ctx = canvas.getContext('2d')
+  // web端处理图片必须先生成一个图片对象
+  let image = new Image()
+  image.src = "图片的本地路径"
+  // 必须在onload函数中才能获取到图片并在它上面绘图
+  image.onload = function(){
+    // 画布大小设置和图片一样大，图片质量就不会改变，也不会被裁剪
+    canvas.width = image.width
+    canvas.height = image.height
+    // 字体根据图片大小动态设置
+    let fontS = image.width/25
+    // 将图片画到画布上
+    ctx.drawImage(image,0,0)
+
+    ctx.fillStyle="#0000ff"
+    ctx.font = `${fontS}px Arial` // 设置字体也必须指定字体类型
+    ctx.fillText(time,50,100)
+    // canvas 2D只能把图片转换为base64格式，直接用img标签即可显示
+    let res = canvas.toDataURL()
+    imgWrap.setAttribute("src",res)
+  }
 ```
