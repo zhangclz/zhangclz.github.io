@@ -133,3 +133,104 @@ export const login = (params) => {
   return instance.post(`/api/test`, params);
 };
 ```
+
+### axios封装请求队列和请求取消
+默认情况下，axios的各个请求是异步的，意味着同一时间，可以发起多个请求，接口返回的顺序和后端处理速度和网络传输速度有关，大部分情况下这没有什么问题。
+然而在一些场景，比如网络环境差，或者后端处理时间长的情况下，如果前端没有做函数防抖、节流或者加载中的等待，那么就可能会造成发起重复请求，并且这些重复请求传递的参数可能会不一致，又因为返回的顺序不可控，所以会导致页面显示和预想的不符。
+针对这种情况，除了在触发事件时做限制，当然这是常规做法，也可以从发起请求时做处理，就是使用请求队列。
+
+思路：将每个请求先放到一个请求队列中，此时如果执行队列中没有正在处理的请求，就从请求队列中读取一个请求到执行队列中执行，当这个请求完成后，清空执行队列，然后从请求队列读取一个请求，以此往复。
+```javascript
+// request.js完整代码
+import axios from "axios"
+
+// 通用配置
+const instance = axios.create({
+  baseURL: "http://xxx.com",
+  timeout: 6000
+})
+// 请求拦截器，主要用于向请求头中添加token或其他属性
+instance.interceptors.request.use(config => {
+  return config
+}, err => {
+  return Promise.reject(err)
+})
+// 响应拦截器，针对不同后端风格的数据结构做响应处理
+instance.interceptors.response.use(response => {
+  // ...其他判断逻辑
+  return response.data
+}, err => {
+  return Promise.reject(err)
+})
+
+// 请求队列
+let requestQueue = []
+// 执行队列
+let executeQueue = []
+// 请求队列函数，将请求添加到队列中
+function requestQueueFn(config,source) {
+  return new Promise((resolve, reject) => {
+    if(executeQueue.length != 0 && config.cancel){
+      // 重复请求并且已经在执行，则取消这个请求
+      if(executeQueue[0].config.url === config.url){
+        executeQueue[0].source.cancel('cancel')
+      }
+    }
+    // 请求重复但是还没有开始执行，删除之前的请求，并将最新的一个请求添加到请求队列末尾
+    let index = requestQueue.findIndex(item => item.config.url === config.url)
+    if(index > -1){
+      requestQueue.splice(index,1)
+    }
+    requestQueue.push({
+      config,
+      resolve,
+      reject,
+      source,
+    })
+    // 执行队列为空，读取一个请求执行
+    if(executeQueue.length === 0){
+      executeQueueFn(requestQueue[0])
+      requestQueue.shift()
+    }
+  })
+}
+// 执行一个请求
+function executeQueueFn(configObj) {
+  executeQueue.push(configObj)
+  // 真正发起请求，请求完成后继续读取并执行
+  instance(configObj.config).then(res => {
+    configObj.resolve(res)
+    executeQueue.shift()
+    if (requestQueue.length > 0) {
+      executeQueueFn(requestQueue[0])
+      requestQueue.shift()
+    }
+  }).catch(err => {
+    executeQueue.shift()
+    configObj.reject(err)
+    if (requestQueue.length > 0) {
+      executeQueueFn(requestQueue[0])
+      requestQueue.shift()
+    }
+  })
+}
+// 对外暴露的请求函数
+export const request = (config) => {
+  if(!config.method || !config.url){
+    return Promise.reject("缺少必要参数")
+  }
+  // 如果不想使用队列和取消请求，就不添加cancel属性，此时就和常规的axios请求一样
+  if(!config.cancel){
+    instance(config)
+  } else {
+    let source = axios.CancelToken.source(); 
+    // 带上cancelToken的config
+    let cf = {
+      ...config,
+      cancelToken: source.token,
+    }
+    return requestQueueFn(cf,source)
+  }
+}
+```
+使用请求队列后，方便的一点就是如果想要针对某个操作做防抖，那么直接在发起请求时，额外传递一个cancel属性即可
