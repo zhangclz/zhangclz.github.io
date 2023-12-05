@@ -161,3 +161,12 @@ let fullName = computed({
   }
 })
 ```
+
+### 在 vue2 中使用防抖和节流，需要将方法从外部导入，然后在组件中声明方法时，使用`:`的方式，而不是直接写一个函数
+```javascript
+methods: {
+  myFun: debounce(function() {
+    // 真正的函数代码
+  }, 2000);
+}
+```

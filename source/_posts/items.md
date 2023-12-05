@@ -5,7 +5,7 @@ tags: 概念
 categories: 日常
 description : 一些实用的方法和操作
 ---
-### JavaScript
+# JavaScript
 * 对字符串直接比较大小会自动把字符串转换为ascll码来比较
 数字和数字字符串比较会做隐式转换为数字
 数字和非数字字符串比较，永远是false，因为非数字字符串隐式转换为数字会得到NAN
@@ -19,8 +19,8 @@ description : 一些实用的方法和操作
 * 使用`typeof`可判断基本类型，判断对象和数组得到'object'，判断函数为'function'
 * 判断引用数据类型使用`instanceof`，判断是否是某个构造函数的实例，但是3种引用类型都是Object的实例，此外数组是Array，函数时Function
 
-### 实用方法
-* 时间戳转换为标准时间格式
+# 实用方法
+### 时间戳转换为标准时间格式
 ```javascript
 function formatDate(){
   function addZero(num){
@@ -41,7 +41,7 @@ function formatDate(){
   return time;
 }
 ```
-* 时间格式转换高级版
+### 时间格式转换高级版
 ```javascript
 function formatTime(date, fmt) {
   let time = date ? new Date(date) : new Date();
@@ -76,7 +76,34 @@ function formatTime(date, fmt) {
 // 接收两个参数：第一个为时间，各种格式都可以。第二个为时间格式，默认只有年月日。
 formatTime("","yyyy-mm-dd HH:MM:SS");
 ```
-* vue中定义函数时接收事件参数外的其他参数
+
+### 根据屏幕宽度和宽高比动态设置根字体大小
+主要使用这个语法`document.documentElement.style.fontSize='16px'`，设置 html 的字体大小
+配合 window.resize 事件，动态计算字体大小并赋值
+```javascript
+function setRem () {
+  var baseSize = 16 // 基准大小
+  var basePc = baseSize / 1920 // 表示1920的设计图,使用100PX的默认值
+  var vW = window.innerWidth // 当前窗口的宽度
+  var vH = window.innerHeight // 当前窗口的高度
+  // 非正常屏幕下的尺寸换算
+  var dueH = (vW * 1080) / 1920
+  if (vH < dueH) {
+    // 当前屏幕高度小于应有的屏幕高度，就需要根据当前屏幕高度重新计算屏幕宽度
+    vW = (vH * 1920) / 1080
+  }
+  var rem = vW * basePc; // 以默认比例值乘以当前窗口宽度,得到该宽度下的相应font-size值
+  (window as any).curRem = rem
+  document.documentElement.style.fontSize = rem + 'px'
+}
+// 加个防抖，操作之后200毫秒内没有再次操作才执行。（而另一个节流是立马执行，然后在指定时间内无法再次执行）
+window.onresize = _.debounce(function () {
+  setRem()
+},200)
+```
+再配合 postcss 的插件，`postcss-pxtorem`插件可以将 px 单位转换为 rem。（注意，目前不要使用最新版 6.0.0，有 bug。使用 5.1.1 即可）
+
+### vue中定义函数时接收事件参数外的其他参数
 ```javascript
 // 方法1：
 @change="handleChange(arguments,index)"
@@ -87,7 +114,7 @@ formatTime("","yyyy-mm-dd HH:MM:SS");
 // status即为事件参数传递的值，index是自己额外传递的值
 ```
 
-* 读取本地excel文件与导出
+### 读取本地excel文件与导出
 
 **在项目中，读取使用一个插件：xlsx(需要使用0.16.0版本，高版本引入不了)，导出还需要另外一个插件：file-saver**
 步骤：
@@ -114,7 +141,7 @@ importFileDemo(obj) {
    reader.readAsBinaryString(f);
 }
 ```
-4. 导出函数，需手动调用
+1. 导出函数，需手动调用
 ```javascript
 outxlsx(json, fields, filename = ".xlsx") {
    //导出xlsx
@@ -167,7 +194,7 @@ s2ab(s) {
 ```
 
 
-### 位运算
+# 位运算
 
 **1. 与： &**
 > 其运算规则是：参与运算的数字，低位对齐，高位不足的补零，如果对应的二进制位同时为 1，那么计算结果才为 1，否则为 0。因此，任何数与 0 进行按位与运算，其结果都为 0

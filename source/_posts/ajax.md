@@ -1,11 +1,20 @@
 ---
-title: ajax
+title: 网络请求
 date: 2021-09-10
 tags: ajax
 categories: JS
-description: ajax的基本使用以及使用promise对ajax进行简易封装
+description: ajax的基本使用以及一些实用方法
 ---
-### 原生ajax的使用
+## Content-Type
+请求头的Content-Type常用有4种
+1. application/json：请求参数是json格式的数据，也是最常用的
+2. application/x-www-form-urlencoded：表单格式的数据，参数需要使用`new FormData`处理参数
+3. multipart/form-data：处理文件上传
+4. text/plain：纯文本数据传输
+
+# ajax
+
+## 原生ajax的使用
 ```javascript
 // html 先模拟一个点击事件
 <button class="btn">点击发送请求</button>
@@ -23,7 +32,7 @@ btn.onclick = function(){
 }
 // 在后端配置正确的情况下就可以发送请求到指定url并获取数据了
 ```
-### 使用promise进行封装
+## 使用promise进行封装
 当需要发送大量请求的时候，上面的原生用法显然不合适，每个请求都要写很多代码，所以就需要对请求进行封装，简化代码，也方便使用
 点击事件同上
 ```javascript
@@ -76,7 +85,7 @@ btn.onclick = function(){
 ---
 后端配置请点击[这里](https://zhangclz.github.io/nodejs/)进行查看，第二条express
 
-### axios的通用封装
+## axios的通用封装
 1. 配置axios实例
 ```javascript
 // instance.js
@@ -134,7 +143,7 @@ export const login = (params) => {
 };
 ```
 
-### axios封装请求队列和请求取消
+## axios封装请求队列和请求取消
 默认情况下，axios的各个请求是异步的，意味着同一时间，可以发起多个请求，接口返回的顺序和后端处理速度和网络传输速度有关，大部分情况下这没有什么问题。
 然而在一些场景，比如网络环境差，或者后端处理时间长的情况下，如果前端没有做函数防抖、节流或者加载中的等待，那么就可能会造成发起重复请求，并且这些重复请求传递的参数可能会不一致，又因为返回的顺序不可控，所以会导致页面显示和预想的不符。
 针对这种情况，除了在触发事件时做限制，当然这是常规做法，也可以从发起请求时做处理，就是使用请求队列。
@@ -234,3 +243,89 @@ export const request = (config) => {
 }
 ```
 使用请求队列后，方便的一点就是如果想要针对某个操作做防抖，那么直接在发起请求时，额外传递一个cancel属性即可
+
+# fetch
+fetch和ajax一样，都是浏览器的原生api，但ajax比fetch更早，兼容性也更好。fetch不支持ie浏览器，但其他现代浏览器除了最低版本也基本都支持
+fetch会返回两个promise，第一个是当响应头成功返回后触发，第二个是当响应体成功返回后触发
+```javascript
+// 使用async await
+const res = await fetch("http://xxx") // 响应头
+const data = await res.json() // 响应体 
+```
+fetch默认是get请求，fetch第二个参数接收一个对象，可配置请求方法，请求参数，请求头等
+
+```javascript
+let headers
+let query
+// 如果是formData格式参数
+if(formData){
+  headers = {
+    "Content-Type" : "application/x-www-form-urlencoded"
+  }
+  /* 方式一 */
+  query = new URLSearchParams(); // 使用URLSearchParams，必须需要指定请求头
+  if(params){ // 请求参数
+    for (const key in params) {
+       query.append(key, params[key]);
+     }
+   }
+   /* 方式二 */
+   query = new FormData() // 使用FormData，可以不指定请求头，浏览器会自动识别
+   if(params){ // 请求参数
+    for (const key in params) {
+       query.append(key, params[key]);
+     }
+   }
+  /* 在这里这两种方式效果是一样的，URLSearchParams主要用于处理简单的键值对参数，适用于较为简单的场景。也可以直接处理get请求格式的参数，直接转换为URLSearchParams格式的数据 */
+
+} else { // JSON格式的参数
+  headers = {
+    "Content-Type" : "application/json"
+  }
+  query = JSON.stringify(params);
+}
+
+const config = {
+  method: "post",
+  headers,
+  body: query
+}
+const res = await fetch("http://xxx",config) // 响应头
+const data = await res.json() // 响应体
+```
+
+## 文件下载
+文件下载主要有两种方式
+1. 直接使用a标签下载，herf设置为下载地址
+
+前提条件：响应头有`content-disposition`属性，浏览器才会触发下载操作。如果没有，则需要手动给a标签添加`download`属性，设置下载的文件名，也可以触发浏览器的下载操作
+```javascript
+const a = document.createElement('a') // 创建a标签
+a.style.display = 'none' // 使之不可见
+a.href = 'https://xxx.com' // 下载地址
+a.download = '' // 设置文件名
+document.body.appendChild(a) // 将a标签插至页面中
+a.click() // 触发a标签事件
+a.remove() // 直接移除a标签元素，更简洁高效，并不需要先获取父元素再调用removeChild去移除
+```
+> 这种方式服务器的文件数据流会直接持续流向用户硬盘，直到下载完成，表现出来就是下载动作会立即响应
+
+2. 使用ajax，fetch等先获取blob二进制数据，然后手动创建一个下载链接，再使用a标签下载，此时是从浏览器的内存中下载，因此没有网络也可以
+
+如果获取到的数据不是blob，则需要先使用`new Blob([xxx])`转为blob，但一般情况下从后端接口获取到的都是blob，然后使用`URL.createObjectURL(blob)`创建一个下载地址，然后操作就和直接使用a标签一样了，只是必须要设置download，因为没有响应头了
+```javascript
+  const downloadUrl = URL.createObjectURL(res); // 创建下载地址
+  //  这种方式可以获取文件名
+  const contentDisposition = res.headers['content-disposition'];
+  const fileName = decodeURI(contentDisposition.split('filename=')[1]);
+
+  const a = document.createElement("a")
+  a.style.display = 'none' // 使之不可见
+  a.href = downloadUrl
+  a.download = fileName; // 设置文件名
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(downloadUrl); // 清除创建的下载地址
+  document.body.removeChild(a); // 或者直接使用 a.remove()
+```
+> 这种方式不适合用于大文件下载，因为它会先把文件全部传输到浏览器内存中，再创建下载地址，表现为点击下载后没反应，过了一会才会开始下载
