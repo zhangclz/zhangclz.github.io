@@ -77,6 +77,21 @@ function formatTime(date, fmt) {
 formatTime("","yyyy-mm-dd HH:MM:SS");
 ```
 
+### 内存单位换算
+```javascript
+function formatSizeUnits(kb) {
+  let units = ['KB', 'MB', 'GB', 'TB', 'PB'];
+  let unitIndex = 0;
+
+  while (kb >= 1024 && unitIndex < units.length - 1) {
+      kb /= 1024;
+      unitIndex++;
+  }
+
+  return `${kb.toFixed(2)} ${units[unitIndex]}`;
+}
+```
+
 ### 根据屏幕宽度和宽高比动态设置根字体大小
 主要使用这个语法`document.documentElement.style.fontSize='16px'`，设置 html 的字体大小
 配合 window.resize 事件，动态计算字体大小并赋值
@@ -95,6 +110,14 @@ function setRem () {
   var rem = vW * basePc; // 以默认比例值乘以当前窗口宽度,得到该宽度下的相应font-size值
   (window as any).curRem = rem
   document.documentElement.style.fontSize = rem + 'px'
+}
+// 另一种方式
+function setRem1 () {
+  const baseSize = 16
+  // 当前页面宽度相对于 1920宽的缩放比例，可根据自己需要修改。
+  const scale = document.documentElement.clientWidth / 1920
+  // 设置页面根节点字体大小（“Math.min(scale, 2)” 指最高放大比例为2，可根据实际业务需求调整）
+  document.documentElement.style.fontSize = baseSize * Math.min(scale, 1) + 'px'
 }
 // 加个防抖，操作之后200毫秒内没有再次操作才执行。（而另一个节流是立马执行，然后在指定时间内无法再次执行）
 window.onresize = _.debounce(function () {
@@ -221,3 +244,65 @@ s2ab(s) {
 > 其运算规则是：只对一个操作数进行运算，将操作数二进制中的 1 改为 0，0 改为 1
 
 **0变1，1变0**
+
+### 文件下载
+1. 直接使用a标签下载，herf设置为下载地址
+前提条件：响应头有`content-disposition`属性，浏览器才会触发下载操作。如果没有，则需要手动给a标签添加`download`属性，设置下载的文件名，也可以触发浏览器的下载操作
+```javascript
+const a = document.createElement('a') // 创建a标签
+a.style.display = 'none' // 使之不可见
+a.href = 'https://xxx.com' // 下载地址
+a.download = '' // 设置文件名
+document.body.appendChild(a) // 将a标签插至页面中
+a.click() // 触发a标签事件
+a.remove() // 直接移除a标签元素，更简洁高效，并不需要先获取父元素再调用removeChild去移除
+```
+这种方式服务器的文件数据流会直接持续流向用户硬盘，直到下载完成，表现出来就是下载动作会立即响应
+2. 使用ajax，fetch等先获取blob二进制数据，然后手动创建一个下载链接，再使用a标签下载，此时是从浏览器的内存中下载，因此没有网络也可以
+如果获取到的数据不是blob，则需要先使用`new Blob([xxx])`转为blob，但一般情况下从后端接口获取到的都是blob，然后使用`URL.createObjectURL(blob)`创建一个下载地址，然后操作就和直接使用a标签一样了，只是必须要设置download，因为没有响应头了
+```javascript
+  const downloadUrl = URL.createObjectURL(res); // 创建下载地址
+  //  这种方式可以获取文件名
+  const contentDisposition = res.headers['content-disposition'];
+  const fileName = decodeURI(contentDisposition.split('filename=')[1]);
+  const a = document.createElement("a")
+  a.href = downloadUrl
+  a.download = fileName; // 设置文件名
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(downloadUrl); // 清除创建的下载地址
+  document.body.removeChild(a);
+
+```
+这种方式不适合用于大文件下载，因为它会先把文件全部传输到浏览器内存中，再创建下载地址，表现为点击下载后没反应，过了一会才会开始下载
+
+### vite
+
+**打包**
+在开发vite+vue3项目时，如果不对vite进行配置，默认是不会进行代码转换的，就会导致打包后，不兼容低版本浏览器。
+ ```javascript
+// vite.config.js
+// 1. 先下载  `@vitejs/plugin-legacy`插件
+// 2. 进行配置
+defineConfig({
+  build: {
+    target: "es2015" // 按理说只添加这个就行了，不确定，后续可验证一下
+  },
+  // 稳妥起见加上这个插件
+  plugins: [
+    legacy({
+      targets: [
+        "> 1%",
+        "not ie 10",
+        "not op_mini all",
+        "chrome >= 78",
+        "edge >= 78",
+        "firefox >= 72",
+        "safari >= 13",
+        "opera >= 66"
+      ]
+    })
+  ]
+})
+```
+这样配置之后，打包的时候就会进行代码转换，以兼容目标浏览器
